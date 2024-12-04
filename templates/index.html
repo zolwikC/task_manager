@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Task Manager</h1>
+    <a class="button" href="/add">Add New Task</a>
+    <ul>
+        {% for task in tasks %}
+        <li class="{% if task.completed %}completed{% endif %}">
+            <div>
+                <strong>{{ task.title }}</strong><br>
+                {{ task.description }}
+            </div>
+            <div class="action-buttons">
+                {% if not task.completed %}
+                <a class="button" href="/complete/{{ loop.index0 }}">Mark as Completed</a>
+                {% endif %}
+                <a class="button" href="/edit/{{ loop.index0 }}">Edit</a>
+                <a class="button" href="/delete/{{ loop.index0 }}">Delete</a>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
