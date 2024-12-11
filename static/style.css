@@ -95,3 +95,12 @@ a {
 a:hover {
     text-decoration: underline;
 }
+
+.filters, .sorting {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.filters .button, .sorting .button {
+    margin: 5px;
+}

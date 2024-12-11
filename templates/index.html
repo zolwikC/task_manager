@@ -1,30 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Task Manager</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <h1>Task Manager</h1>
+    <div class="filters">
+        <a href="/?filter=all" class="button">All</a>
+        <a href="/?filter=pending" class="button">Pending</a>
+        <a href="/?filter=completed" class="button">Completed</a>
+    </div>
+    <div class="sorting">
+        <a href="/?sort_by=created_at" class="button">Sort by Date</a>
+        <a href="/?sort_by=title" class="button">Sort by Title</a>
+    </div>
     <a class="button" href="/add">Add New Task</a>
     <ul>
         {% for task in tasks %}
         <li class="{% if task.completed %}completed{% endif %}">
             <div>
                 <strong>{{ task.title }}</strong><br>
-                {{ task.description }}
+                {{ task.description }}<br>
+                Created at: {{ task.created_at.strftime('%Y-%m-%d %H:%M:%S') }}
             </div>
             <div class="action-buttons">
                 {% if not task.completed %}
-                <a class="button" href="/complete/{{ loop.index0 }}">Mark as Completed</a>
+                <a class="button" href="/complete/{{ task.id }}">Mark as Completed</a>
                 {% endif %}
-                <a class="button" href="/edit/{{ loop.index0 }}">Edit</a>
-                <a class="button" href="/delete/{{ loop.index0 }}">Delete</a>
+                <a class="button" href="/edit/{{ task.id }}">Edit</a>
+                <a class="button" href="/delete/{{ task.id }}">Delete</a>
             </div>
         </li>
         {% endfor %}
     </ul>
 </body>
-</html>
