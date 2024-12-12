@@ -1,16 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from datetime import datetime
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///tasks.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
-
-from flask_migrate import Migrate
-
-# Inicjalizacja Flask-Migrate
-migrate = Migrate(app, db)
+migrate = Migrate(app, db)  # Konfiguracja Flask-Migrate
 
 # Model dla zadania
 class Task(db.Model):
@@ -19,6 +16,7 @@ class Task(db.Model):
     description = db.Column(db.Text, nullable=False)
     completed = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    deadline = db.Column(db.DateTime, nullable=True)  # Nowe pole dla terminu
 
 @app.route("/")
 def index():
@@ -34,6 +32,8 @@ def index():
     
     if sort_by == "title":
         query = query.order_by(Task.title)
+    elif sort_by == "deadline":
+        query = query.order_by(Task.deadline)
     else:  # Domyślnie sortuj według daty dodania
         query = query.order_by(Task.created_at)
     
@@ -45,7 +45,9 @@ def add_task():
     if request.method == "POST":
         title = request.form["title"]
         description = request.form["description"]
-        new_task = Task(title=title, description=description)
+        deadline = request.form["deadline"]
+        deadline = datetime.strptime(deadline, "%Y-%m-%d") if deadline else None
+        new_task = Task(title=title, description=description, deadline=deadline)
         db.session.add(new_task)
         db.session.commit()
         return redirect(url_for("index"))
@@ -57,6 +59,8 @@ def edit_task(task_id):
     if request.method == "POST":
         task.title = request.form["title"]
         task.description = request.form["description"]
+        deadline = request.form["deadline"]
+        task.deadline = datetime.strptime(deadline, "%Y-%m-%d") if deadline else None
         db.session.commit()
         return redirect(url_for("index"))
     return render_template("edit_task.html", task=task)
@@ -76,6 +80,4 @@ def complete_task(task_id):
     return redirect(url_for("index"))
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)

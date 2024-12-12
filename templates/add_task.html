@@ -6,15 +6,28 @@
     <title>Add Task</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
-<body>
-    <h1>Add New Task</h1>
-    <form method="post">
-        <label for="title">Task Title:</label>
-        <input type="text" id="title" name="title" required>
-        <label for="description">Description:</label>
-        <textarea id="description" name="description" required></textarea>
-        <button type="submit">Add Task</button>
-    </form>
-    <a class="button" href="/">Back to Home</a>
+<body class="bg-light">
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">{{ 'Add New Task' if request.path == '/add' else 'Edit Task' }}</h1>
+        <form method="post" class="card p-4 shadow-sm">
+            <div class="mb-3">
+                <label for="title" class="form-label">Task Title</label>
+                <input type="text" id="title" name="title" class="form-control" value="{{ task.title if task else '' }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea id="description" name="description" class="form-control" rows="4" required>{{ task.description if task else '' }}</textarea>
+            </div>
+            <div class="mb-3">
+                <label for="deadline" class="form-label">Deadline</label>
+                <input type="date" id="deadline" name="deadline" class="form-control" value="{{ task.deadline.strftime('%Y-%m-%d') if task and task.deadline else '' }}">
+            </div>
+            <div class="text-end">
+                <button type="submit" class="btn btn-success">{{ 'Add Task' if request.path == '/add' else 'Save Changes' }}</button>
+                <a href="/" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
 </body>
+
 </html>
