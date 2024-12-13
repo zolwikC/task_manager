@@ -9,32 +9,52 @@
 <body class="bg-light">
     <div class="container mt-5">
         <h1 class="text-center mb-4">Task Manager</h1>
+
+        <!-- Formularz wyszukiwania -->
+        <form method="get" action="/" class="mb-3">
+            <div class="input-group">
+                <input type="text" name="search" class="form-control" placeholder="Search tasks..." value="{{ search_query }}">
+                <button class="btn btn-outline-primary" type="submit">Search</button>
+            </div>
+        </form>
+
+        <!-- Filtry i sortowanie -->
         <div class="d-flex justify-content-between mb-3">
             <div>
                 <a href="/?filter=all" class="btn btn-primary btn-sm">All</a>
                 <a href="/?filter=pending" class="btn btn-warning btn-sm">Pending</a>
                 <a href="/?filter=completed" class="btn btn-success btn-sm">Completed</a>
+                <a href="/?filter=overdue" class="btn btn-danger btn-sm">Overdue</a>
+                <a href="/?filter=upcoming" class="btn btn-info btn-sm">Upcoming</a>
             </div>
             <div>
                 <a href="/?sort_by=created_at" class="btn btn-secondary btn-sm">Sort by Date</a>
                 <a href="/?sort_by=title" class="btn btn-secondary btn-sm">Sort by Title</a>
+                <a href="/?sort_by=priority" class="btn btn-secondary btn-sm">Sort by Priority</a>
                 <a href="/?sort_by=deadline" class="btn btn-secondary btn-sm">Sort by Deadline</a>
             </div>
         </div>
-        <div class="mb-3 text-end">
+
+        <!-- Przycisk dodawania i eksportu -->
+        <div class="d-flex justify-content-between mb-3">
             <a href="/add" class="btn btn-success">Add New Task</a>
+            <a href="/export" class="btn btn-outline-dark">Export Tasks</a>
         </div>
+
+        <!-- Lista zadań -->
         <ul class="list-group">
-            {% for task in tasks %}
-            <li class="list-group-item d-flex justify-content-between align-items-center {% if task.completed %}list-group-item-success{% elif task.deadline and task.deadline < now() %}list-group-item-danger{% elif task.deadline and task.deadline < now() + timedelta(days=2) %}list-group-item-warning{% endif %}">
+            {% for task in tasks.items %}
+            <li class="list-group-item d-flex justify-content-between align-items-center {% if task.priority == 'High' %}list-group-item-danger{% elif task.completed %}list-group-item-success{% elif task.deadline and task.deadline < now() %}list-group-item-warning{% endif %}">
                 <div>
                     <h5>{{ task.title }}</h5>
                     <p class="mb-0">{{ task.description }}</p>
-                    {% if task.deadline %}
-                    <small class="text-muted">Deadline: {{ task.deadline.strftime('%Y-%m-%d') }}</small>
-                    {% endif %}
+                    <small class="text-muted">
+                        Priority: {{ task.priority }} |
+                        Deadline: {{ task.deadline.strftime('%Y-%m-%d') if task.deadline else 'No deadline' }}
+                    </small>
                 </div>
                 <div>
+                    <a href="/details/{{ task.id }}" class="btn btn-sm btn-outline-info">Details</a>
                     {% if not task.completed %}
                     <a href="/complete/{{ task.id }}" class="btn btn-sm btn-outline-success">Mark as Completed</a>
                     {% endif %}
@@ -44,5 +64,23 @@
             </li>
             {% endfor %}
         </ul>
+
+        <!-- Paginacja -->
+        <nav aria-label="Task navigation" class="mt-3">
+            <ul class="pagination justify-content-center">
+                {% if tasks.has_prev %}
+                <li class="page-item"><a class="page-link" href="?page={{ tasks.prev_num }}">&laquo; Prev</a></li>
+                {% endif %}
+                {% for page_num in tasks.iter_pages() %}
+                <li class="page-item {% if page_num == tasks.page %}active{% endif %}">
+                    <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+                </li>
+                {% endfor %}
+                {% if tasks.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ tasks.next_num }}">Next &raquo;</a></li>
+                {% endif %}
+            </ul>
+        </nav>
     </div>
 </body>
+

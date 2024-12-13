@@ -19,6 +19,14 @@
                 <textarea id="description" name="description" class="form-control" rows="4" required>{{ task.description if task else '' }}</textarea>
             </div>
             <div class="mb-3">
+                <label for="priority" class="form-label">Priority</label>
+                <select id="priority" name="priority" class="form-control">
+                    <option value="Low" {% if task and task.priority == 'Low' %}selected{% endif %}>Low</option>
+                    <option value="Medium" {% if not task or task.priority == 'Medium' %}selected{% endif %}>Medium</option>
+                    <option value="High" {% if task and task.priority == 'High' %}selected{% endif %}>High</option>
+                </select>
+            </div>
+            <div class="mb-3">
                 <label for="deadline" class="form-label">Deadline</label>
                 <input type="date" id="deadline" name="deadline" class="form-control" value="{{ task.deadline.strftime('%Y-%m-%d') if task and task.deadline else '' }}">
             </div>
